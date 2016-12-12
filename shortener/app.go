@@ -59,9 +59,14 @@ func NewApp(configFile string) *App {
 		),
 	)
 
+	// configure groupcache pool
+	cachePool := groupcache.NewHTTPPool("127.0.0.1")
+	// cachePool.Set(p...)
+	_ = cachePool
+
 	// TODO: add handlers
-	app.GET("/shorten", app.index)
-	app.GET("/original", app.index)
+	app.POST("/shorten", app.shorten)
+	app.GET("/original", app.original)
 
 	// add static resources handler
 	fs := http.FileServer(http.Dir("static"))
@@ -74,6 +79,11 @@ func NewApp(configFile string) *App {
 	h = handlers.RecoveryHandler()(h)
 	app.handlers = h
 	return &app
+}
+
+// Handle handler errors
+func (a *App) handleError(w http.ResponseWriter, err error) {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
 // Run runs this web application

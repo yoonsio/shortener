@@ -1,5 +1,15 @@
 package shortener
 
+// ShortenRequest is json request structure for /shorten
+type ShortenRequest struct {
+	URL string
+}
+
+// OriginalReq is json request structure for /original
+type OriginalReq struct {
+	Short string
+}
+
 // Config is configuration structure
 type Config struct {
 	Server   ServerConfig
