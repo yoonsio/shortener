@@ -2,7 +2,6 @@ package shortener
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/golang/groupcache"
@@ -17,29 +16,59 @@ func (a *App) shorten(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		a.handleError(w, err)
 		return
 	}
-	log.Println(v)
-	// TODO: push to db
-	// TODO: fill cache
+
+	// TODO: validate ShortenRequest
+
+	// generate short URI (random?)
+	// TODO: get current URL from configuration
+	// TODO: optimize string cocatenation
+	short := "https://localhost:9000/" + GenerateRandomString(8)
+
+	// push to db
+	err = a.db.Register(v.URL, short)
+	if err != nil {
+		a.handleError(w, err)
+		return
+	}
+
+	resp, err := json.Marshal(ShortenResponse{short})
+	if err != nil {
+		a.handleError(w, err)
+		return
+	}
+
+	// return correct response
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resp)
 }
 
 func (a *App) original(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	// parse data
-	var v OriginalReq
+	var v OriginalRequest
 	err := json.NewDecoder(r.Body).Decode(&v)
 	if err != nil {
 		a.handleError(w, err)
 		return
 	}
-	log.Println(v)
-	key := v.Short
-	// search from cache
+
+	// TODO: validate OriginalReq
+
+	// search from cache (which in turn search database)
 	var b []byte
-	err = a.cacheGroup.Get(nil, key, groupcache.AllocatingByteSliceSink(&b))
+	err = a.cacheGroup.Get(nil, v.Short, groupcache.AllocatingByteSliceSink(&b))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	// write result
-	w.Write(b)
-	w.Write([]byte{'\n'})
+
+	resp, err := json.Marshal(OriginalResponse{string(b)})
+	if err != nil {
+		a.handleError(w, err)
+		return
+	}
+
+	// return correct response
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(resp)
+
 }

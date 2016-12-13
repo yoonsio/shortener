@@ -1,7 +1,6 @@
 package shortener
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -46,15 +45,12 @@ func NewApp(configFile string) *App {
 		64<<20,
 		groupcache.GetterFunc(
 			func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
-				// TODO: look for value from database
-				var v []byte
-				ok := false
-				// if not found, return error
-				if !ok {
-					return errors.New("failed to find a key")
+				// look up value from database
+				uriMap, err := app.db.FindOriginal(key)
+				if err == nil {
+					dest.SetString(uriMap.Original)
 				}
-				dest.SetBytes(v)
-				return nil
+				return err
 			},
 		),
 	)

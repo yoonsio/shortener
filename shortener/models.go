@@ -1,13 +1,33 @@
 package shortener
 
+import "time"
+
 // ShortenRequest is json request structure for /shorten
 type ShortenRequest struct {
 	URL string
 }
 
-// OriginalReq is json request structure for /original
-type OriginalReq struct {
+// ShortenResponse is json response structure for /shorten
+type ShortenResponse struct {
 	Short string
+}
+
+// OriginalRequest is json request structure for /original
+type OriginalRequest struct {
+	Short string
+}
+
+// OriginalResponse is json response structure for /original
+type OriginalResponse struct {
+	Original string
+}
+
+// URIMap is database object that represents
+// mapping between original URI and shortened URI
+type URIMap struct {
+	Original  string
+	Short     string
+	Timestamp time.Time
 }
 
 // Config is configuration structure

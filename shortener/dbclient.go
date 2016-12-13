@@ -2,8 +2,10 @@ package shortener
 
 import (
 	"log"
+	"time"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // MongoClient holds master session and other db-related info
@@ -29,4 +31,29 @@ func NewMongoClient(uri, dbName string) *MongoClient {
 // Be sure to close the session after done
 func (mc *MongoClient) GetSession() *mgo.Session {
 	return mc.session.Copy()
+}
+
+// Register inserts URL into database
+func (mc *MongoClient) Register(original, short string) error {
+	s := mc.GetSession()
+	// TODO: create index??
+	err := s.DB(mc.dbName).C("map").Insert(&URIMap{
+		original,
+		short,
+		time.Now().UTC(),
+	})
+	s.Close()
+	return err
+}
+
+// FindOriginal searches for Original URL from database
+func (mc *MongoClient) FindOriginal(short string) (*URIMap, error) {
+	s := mc.GetSession()
+	defer s.Close()
+	var uriMap URIMap
+	err := s.DB(mc.dbName).C("map").Find(bson.M{"short": short}).One(&uriMap)
+	if err != nil {
+		return nil, err
+	}
+	return &uriMap, err
 }

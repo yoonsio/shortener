@@ -7,7 +7,7 @@ Fast URL shortener service written in Go
 Get shortened URL
 
 ```bash
-curl -sX POST -H 'Content-Type: application/json' 'localhost/shorten' -d '{"url":"http://a.very.long.url"}'
+curl -sX POST -H 'Content-Type: application/json' 'localhost:9000/shorten' -d '{"url":"https://sickyoon.com"}'
 
 > HTTP 200
 > '{"short":"http://localhost/abcdef"}'
