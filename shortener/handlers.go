@@ -31,15 +31,13 @@ func (a *App) shorten(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 		return
 	}
 
-	resp, err := json.Marshal(ShortenResponse{short})
+	// return correct response
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(ShortenResponse{short})
 	if err != nil {
 		a.handleError(w, err)
 		return
 	}
-
-	// return correct response
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
 }
 
 func (a *App) original(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -61,14 +59,12 @@ func (a *App) original(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		return
 	}
 
-	resp, err := json.Marshal(OriginalResponse{string(b)})
+	// return correct response
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(OriginalResponse{string(b)})
 	if err != nil {
 		a.handleError(w, err)
 		return
 	}
-
-	// return correct response
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(resp)
 
 }

@@ -16,10 +16,10 @@ curl -sX POST -H 'Content-Type: application/json' 'localhost:9000/shorten' -d '{
 Get original URL
 
 ```bash
-curl -sX GET -H 'Content-Type: application/json' 'localhost/original' -d '{"short":"http://localhost/abcdef"}'
+curl -sX GET -H 'Content-Type: application/json' 'localhost:9000/original' -d '{"short":"http://localhost/abcdef"}'
 
 > HTTP 200
-> {"original":"http://a.very.long.url"}
+> {"original":"https://sickyoon.com"}
 ```
 
 ## Features
